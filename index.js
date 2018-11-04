@@ -5,6 +5,7 @@ const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
 
 const Product = require('./models/product')
+const User = require('./models/user')
 
 const app = express()
 const mongoUrl = 'mongodb://localhost:27017/shop'
@@ -14,11 +15,11 @@ app.use(bodyParser.urlencoded({extended: false}))
 app.use(bodyParser.json())
 
 
-
+/*------------------PRODUCTS--------------------*/
 app.get('/api/product/:productId', (req, res) => {
 	console.log('GET /api/product/:productId')
-	let productId = req.params.productId
 
+	let productId = req.params.productId
 	Product.findById(productId, (err, product) => {
 		if(err)
 			return res.status(500).send({message:`Error al realizar la petición: ${err}`})
@@ -47,26 +48,91 @@ app.post('/api/product', (req, res) => {
 })
 
 app.put('/api/product/:productId', (req, res) =>{
-	let productId = req.params.productId
 	let update = req.body
+	console.log('PUT /api/product/:productId')
+	console.log(update)
 
-	Product.findByIdAndUpdate(productId, update, (err,productUpdated) => {
+	let productId = req.params.productId
+	Product.findByIdAndUpdate(productId, update, (err,oldProduct) => {
 		if(err)
 			res.status(500).send({message: `Error al actualizar el producto: ${err}`})
-		res.status(200).send({product: productUpdated})
+		res.status(200).send({oldProduct})
 	})
 })
 
 app.delete('/api/product/:productId', (req,res) => {
+	console.log('DELETE /api/product/:productId')
+
 	let productId = req.params.productId
 	Product.findById(productId, (err, product) => {
 		if(err)
 			return res.status(500).send({message:`Error al borrar el producto: ${err}`})
-
+		if(!product)
+			return res.status(404).send({message:`El producto no existe`})
 		product.remove(err => {
 			if(err)
 				res.status(500).send({message:`Error al borrar el producto: ${err}`})
 			res.status(200).send({message:'El producto ha sido borrado'})	
+		})
+	})
+})
+
+
+/*--------------------USERS----------------------*/
+app.get('/api/user/:userId', (req, res) => {
+	console.log('GET /api/user/:userId')
+
+	let userId = req.params.userId
+	User.findById(userId, (err, user) => {
+		if(err)
+			return res.status(500).send({message: `Error al realizar peticion: ${err}`})
+		if(!user)
+			return res.status(404).send({message:`El usuario no existe`})
+		res.status(200).send({user})
+	})
+})
+
+app.post('/api/user', (req, res) => {
+	console.log('POST /api/user')
+	console.log(req.body)
+
+	let user = new User()
+	user.name = req.body.name
+	user.pwd = req.body.pwd
+
+	user.save((err, userStored) => {
+		if(err)
+			return res.status(500).send({message: `Error al crear usuario: ${err}`})
+		res.status(200).send({message: userStored})
+	})
+})
+
+app.put('/api/user/:userId', (req, res) => {
+	let updated = req.body
+	console.log('PUT /api/user/:userId')
+	console.log(updated)
+
+	let userId = req.params.userId
+	User.findByIdAndUpdate(userId, updated, (err, oldUser) => {
+		if(err)
+			return res.status(500).send({message: `Error al actualizar usuario: ${err}`})
+		res.status(200).send({oldUser})
+	})
+})
+
+app.delete('/api/user/:userId', (req, res) => {
+	console.log('DELETE /api/user/:userId')
+
+	let userId = req.params.userId
+	User.findById(userId, (err, user) => {
+		if(err)
+			return res.status(500).send({message: `Error al borrar usuario: ${err}`})
+		if(!user)
+			return res.status(404).send({message:`El usuario no existe`})
+		user.remove(err => {
+			if(err)
+				return res.status(500).send({message: `Error al borrar usuario: ${err}`})
+			res.status(200).send({message: `El usuario ha sido borrado`})
 		})
 	})
 })
