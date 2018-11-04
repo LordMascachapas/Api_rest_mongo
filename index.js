@@ -158,6 +158,27 @@ app.delete('/api/user/:userId', (req, res) => {
 })
 
 
+/*----------------------PURCHASES---------------------------*/
+app.put('/api/purchase/:userId/:productId', (req, res) => {
+	console.log('PUT /api/purchase/:userId/:productId')
+
+	let userId = req.params.userId
+	let productId = req.params.productId
+	let update = {
+		$push:{purchases: productId}
+	}
+	Product.findById(productId, (err, product) => {	
+		if(err)
+			return res.status(500).send({message:`Error con el producto al realizar la compra: ${err}`})
+		User.findByIdAndUpdate(userId, update, (err, oldUser) => {
+			if(err)
+				return res.status(500).send({message:`Error al realizar la compra: ${err}`})
+			res.status(200).send({oldUser})
+		})
+	})
+})
+
+
 
 mongoose.connect(mongoUrl, { useNewUrlParser: true }, (err, res) =>{
 	if(err) console.log(`Error al conectar con la bases de datos: ${err}`)
