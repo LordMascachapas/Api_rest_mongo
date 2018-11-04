@@ -16,6 +16,16 @@ app.use(bodyParser.json())
 
 
 /*------------------PRODUCTS--------------------*/
+app.get('/api/product', (req, res) => {
+	console.log('GET /api/product')
+
+	Product.find({}, (err, products) => {
+		if(err)
+			return res.status(500).send({message: `Error al realizar peticion: ${err}`})
+		res.status(200).send({products})
+	})
+})
+
 app.get('/api/product/:productId', (req, res) => {
 	console.log('GET /api/product/:productId')
 
@@ -79,6 +89,16 @@ app.delete('/api/product/:productId', (req,res) => {
 
 
 /*--------------------USERS----------------------*/
+app.get('/api/user', (req, res) => {
+	console.log('GET /api/user')
+
+	User.find({}, (err, users) => {
+		if(err)
+			return res.status(500).send({message: `Error al realizar peticion: ${err}`})
+		res.status(200).send({users})
+	})
+})
+
 app.get('/api/user/:userId', (req, res) => {
 	console.log('GET /api/user/:userId')
 
