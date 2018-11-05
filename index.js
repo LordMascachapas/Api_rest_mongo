@@ -170,6 +170,8 @@ app.put('/api/purchase/:userId/:productId', (req, res) => {
 	Product.findById(productId, (err, product) => {	
 		if(err)
 			return res.status(500).send({message:`Error con el producto al realizar la compra: ${err}`})
+		if(!product)
+			return res.status(404).send({message:'El producto no existe'})
 		User.findByIdAndUpdate(userId, update, (err, oldUser) => {
 			if(err)
 				return res.status(500).send({message:`Error al realizar la compra: ${err}`})
