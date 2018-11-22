@@ -14,6 +14,7 @@ api.delete('/product/:productId', Product.deleteProduct)
 
 api.get('/user', User.getUsers)
 api.get('/user/:userId', User.getUser)
+api.get('/user/:userId/products', User.getProducts)
 api.post('/user', User.createUser)
 api.put('/user/:userId', User.updateUser)
 api.delete('/user/:userId', User.deleteUser)

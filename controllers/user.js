@@ -1,7 +1,7 @@
 'use strict'
 
 const User = require('../models/user')
-const Product = require('./product')
+const Product = require('../models/product')
 
 function createUser(req, res){
 	console.log('POST /api/user')
@@ -92,11 +92,37 @@ function purchase(req, res){
 	})
 }
 
+function getProducts(req, res) {
+	console.log('GET /api/user/:userId/products')
+
+	let userId = req.params.userId
+	User.findById(userId, async(err, user) => {
+		if(err)
+			return res.status(500).send({message:`Error con el usuario al realizar la petición: ${err}`})
+		if (!user)
+			return res.status(404).send({message:'Error, no existe usuario'})
+		let productsList = []
+		for (var i = user.purchases.length - 1; i >= 0; i--) {
+			console.log(user.purchases[i])
+			await Product.findById(user.purchases[i], (err, product) => {
+				if(err)
+					return res.status(500).send({message:`Error con el usuario al realizar la petición: ${err}`})
+				if(!product)
+					return res.status(500).send({message:'Error, no existe el producto'})
+				console.log(product)
+				productsList[productsList.length] = product
+			})
+		}
+		res.status(200).send({productsList})
+	})
+}
+
 module.exports = {
 	createUser,
 	getUser,
 	getUsers,
 	updateUser,
 	deleteUser,
-	purchase
+	purchase,
+	getProducts
 }
